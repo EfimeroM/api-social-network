@@ -14,8 +14,8 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use("/api", UserRoutes)
-app.use("/api", PublicationRoutes)
-app.use("/api", FollowRoutes)
+app.use("/api/user", UserRoutes)
+app.use("/api/publication", PublicationRoutes)
+app.use("/api/follow", FollowRoutes)
 
 app.listen(PORT, ()=> console.log("Initialized server on port:", PORT))
