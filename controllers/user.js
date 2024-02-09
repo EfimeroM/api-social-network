@@ -55,10 +55,19 @@ const login = async (req, res) => {
     },
     token
   })
+}
 
+const getById = async (req, res) => {
+  const { id } = req.params
+  const userDb = await User.findById(id).select({ password: 0, role: 0 }).exec()
+
+  if (!userDb) return res.status(404).send({ status: "error", message: "User not found" })
+
+  return res.status(200).send({ status: "success", message: "Get user by Id", user: userDb })
 }
 
 module.exports = {
   register,
-  login
+  login,
+  getById
 }
