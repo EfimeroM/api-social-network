@@ -1,5 +1,6 @@
 const User = require("../models/User")
 const bcrypt = require("bcrypt")
+const jwt = require("../services/jwt")
 
 const register = async (req, res) => {
   const params = req.body
@@ -26,12 +27,38 @@ const register = async (req, res) => {
 
     if (!userStored) return res.status(500).json({ status: "error", message: "Error to register user" })
 
-    return res.status(200).json({ status: "success", message: "register", user: userStored })
+    return res.status(200).json({ status: "success", message: "User registered", user: userStored })
   } catch (error) {
     return res.status(400).json({ status: "error", message: `Error to register user: ${error.message}` })
   }
 }
 
+const login = async (req, res) => {
+  const params = req.body
+  if (!params.email || !params.password) return res.status(400).json({ status: "error", message: "User data not found" })
+
+  const userDb = await User.findOne({ email: params.email })
+  if (!userDb) return res.status(404).json({ status: "error", message: "User not found" })
+
+  const pwd = bcrypt.compareSync(params.password, userDb.password)
+  if (!pwd) return res.status(400).json({ status: "error", message: "User password is incorrect" })
+
+  const token = jwt.createToken(userDb)
+
+  return res.status(200).json({
+    status: "success",
+    message: "User loged",
+    user: {
+      _id: userDb._id,
+      name: userDb.name,
+      nick: userDb.nick
+    },
+    token
+  })
+
+}
+
 module.exports = {
-  register
+  register,
+  login
 }
