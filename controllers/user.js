@@ -2,6 +2,7 @@ const User = require("../models/User")
 const bcrypt = require("bcrypt")
 const jwt = require("../services/jwt")
 const mongoosePaginate = require("mongoose-pagination")
+const fs = require("fs")
 
 const register = async (req, res) => {
   const params = req.body
@@ -87,9 +88,67 @@ const list = async (req, res) => {
   })
 }
 
+const update = async (req, res) => {
+  const userIdentity = {
+    ...req.user,
+    iat: undefined,
+    exp: undefined,
+    role: undefined,
+    image: undefined
+  }
+  const userToUpdate = req.body
+
+  const usersDb = await User.find({
+    $or: [
+      { email: userToUpdate.email.toLowerCase() },
+      { nick: userToUpdate.nick.toLowerCase() }
+    ]
+  }).exec()
+  let userIsset = false
+
+  usersDb.forEach(user => {
+    if (user && user._id != userIdentity._id) userIsset = true
+  })
+  if (userIsset) return res.status(400).json({ status: "error", message: "User already exists" })
+
+  if (userToUpdate.password) {
+    let pwd_hash = await bcrypt.hash(userToUpdate.password, 10)
+    userToUpdate.password = pwd_hash
+  }
+
+  try {
+    const userUpdated = await User.findByIdAndUpdate(userIdentity._id, userToUpdate, { new: true })
+    if (!userUpdated) return res.status(404).json({ status: "error", message: "User not found" })
+    //token needs to be updated
+    return res.status(200).send({ status: "success", message: "User updated", user: userUpdated })
+  } catch (error) {
+    return res.status(400).json({ status: "error", message: "Error to update user" })
+  }
+}
+
+const uploadImage = async (req, res) => {
+  const { file } = req
+  if (!file) return res.status(404).json({ status: "error", message: "Image not found" })
+  let fileName = file.originalname
+  let split_file = fileName.split(".")
+  let file_extension = split_file[1]
+
+  if (!["png", "jpg", "jpeg", "gif"].includes(file_extension)) {
+    fs.unlinkSync(file.path)
+    return res.status(400).json({ status: "error", message: "Invalid File" })
+  }
+
+  //userUpdated needs to be delete password
+  const userUpdated = await User.findByIdAndUpdate(req.user._id, { image: req.file.filename }, { new: true })
+  if(!userUpdated) return res.status(400).json({ status: "error", message: "Error to update user" })
+  return res.status(200).send({ status: "success", message: "Image uploaded", file: req.file, user: userUpdated })
+}
+
 module.exports = {
   register,
   login,
   getById,
-  list
+  list,
+  update,
+  uploadImage
 }
