@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt")
 const jwt = require("../services/jwt")
 const mongoosePaginate = require("mongoose-pagination")
 const fs = require("fs")
+const path = require("path")
+const { IMAGES_PATH } = require("../config")
 
 const register = async (req, res) => {
   const params = req.body
@@ -140,8 +142,18 @@ const uploadImage = async (req, res) => {
 
   //userUpdated needs to be delete password
   const userUpdated = await User.findByIdAndUpdate(req.user._id, { image: req.file.filename }, { new: true })
-  if(!userUpdated) return res.status(400).json({ status: "error", message: "Error to update user" })
+  if (!userUpdated) return res.status(400).json({ status: "error", message: "Error to update user" })
   return res.status(200).send({ status: "success", message: "Image uploaded", file: req.file, user: userUpdated })
+}
+
+const getImage = async(req, res) => {
+  const fileName = req.params.file
+  const filePath = `${IMAGES_PATH}${fileName}`
+
+  fs.stat(filePath, (error, exists)=>{
+    if(exists) return res.sendFile(path.resolve(filePath))
+    else return res.status(404).json({ status: "error", message: "Image not found", fileName, filePath })
+  })
 }
 
 module.exports = {
@@ -150,5 +162,6 @@ module.exports = {
   getById,
   list,
   update,
-  uploadImage
+  uploadImage,
+  getImage
 }

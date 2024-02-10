@@ -3,9 +3,10 @@ const router = express.Router()
 const multer = require("multer")
 const UserController = require("../controllers/user")
 const check = require("../middlewares/auth")
+const { IMAGES_PATH } = require("../config")
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "./uploads/avatars"),
+  destination: (req, file, cb) => cb(null, IMAGES_PATH),
   filename: (req, file, cb) => cb(null, `avatar-${Date.now()}-${file.originalname}`)
 })
 
@@ -17,5 +18,6 @@ router.get("/profile/:id", check.auth, UserController.getById)
 router.get("/list/:page?", check.auth, UserController.list)
 router.put("/update", check.auth, UserController.update)
 router.post("/upload", [check.auth, uploads.single("file0")], UserController.uploadImage)
+router.get("/avatar/:file", check.auth, UserController.getImage)
 
 module.exports = router
