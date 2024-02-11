@@ -10,7 +10,7 @@ const PublicationSchema = Schema({
     required: true
   },
   file: String,
-  create_at: {
+  created_at: {
     type: Date,
     default: Date.now,
   }

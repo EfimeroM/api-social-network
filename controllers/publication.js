@@ -30,8 +30,32 @@ const remove = async (req, res) => {
   return res.status(200).send({ status: "success", message: "Publication remove success", publication: publicationId })
 }
 
+const user = async (req, res) => {
+  const userId = req.params.id
+  const page = parseInt(req.params.page) || 1
+  const itemsPerPage = 5
+
+  const publicationStored = await Publication
+    .find({ user: userId })
+    .sort("-created_at")
+    .populate("user", "-password -__v -role")
+    .paginate(page, itemsPerPage)
+  if (!publicationStored) return res.status(404).send({ status: "error", message: "Publications not found" })
+  const total = await Publication.find({ user: userId }).countDocuments().exec()
+
+  return res.status(200).send({
+    status: "success",
+    message: "User publication list",
+    publications: publicationStored,
+    page,
+    pages: Math.ceil(total / itemsPerPage),
+    total
+  })
+}
+
 module.exports = {
   save,
   detail,
-  remove
+  remove,
+  user
 }
