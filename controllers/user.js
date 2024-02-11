@@ -2,6 +2,7 @@ const User = require("../models/User")
 const bcrypt = require("bcrypt")
 const jwt = require("../services/jwt")
 const mongoosePaginate = require("mongoose-pagination")
+const followService = require("../services/followService")
 const fs = require("fs")
 const path = require("path")
 const { IMAGES_PATH } = require("../config")
@@ -66,8 +67,9 @@ const getById = async (req, res) => {
   const userDb = await User.findById(id).select({ password: 0, role: 0 }).exec()
 
   if (!userDb) return res.status(404).send({ status: "error", message: "User not found" })
+  const followInfo = await followService.followThisUser(req.user._id, id)
 
-  return res.status(200).send({ status: "success", message: "Get user by Id", user: userDb })
+  return res.status(200).send({ status: "success", message: "Get user by Id", user: userDb, following: followInfo.following, follower: followInfo.followers })
 }
 
 const list = async (req, res) => {
@@ -78,15 +80,18 @@ const list = async (req, res) => {
   if (!usersDb) return res.status(404).send({ status: "error", message: "Users not found" })
 
   const total = await User.countDocuments().exec()
+  const followUserIds = await followService.followUserIds(req.user._id)
 
   return res.status(200).send({
     status: "success",
     message: "Get users with page",
     users: usersDb,
+    usersFollowing: followUserIds.following,
+    usersFollowers: followUserIds.followers,
     page,
+    pages: Math.ceil(total / itemsPerPage),
     itemsPerPage,
-    total,
-    pages: Math.ceil(total / itemsPerPage)
+    total
   })
 }
 
@@ -146,12 +151,12 @@ const uploadImage = async (req, res) => {
   return res.status(200).send({ status: "success", message: "Image uploaded", file: req.file, user: userUpdated })
 }
 
-const getImage = async(req, res) => {
+const getImage = async (req, res) => {
   const fileName = req.params.file
   const filePath = `${IMAGES_PATH}${fileName}`
 
-  fs.stat(filePath, (error, exists)=>{
-    if(exists) return res.sendFile(path.resolve(filePath))
+  fs.stat(filePath, (error, exists) => {
+    if (exists) return res.sendFile(path.resolve(filePath))
     else return res.status(404).json({ status: "error", message: "Image not found", fileName, filePath })
   })
 }
