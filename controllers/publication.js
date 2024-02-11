@@ -21,7 +21,17 @@ const detail = async (req, res) => {
   return res.status(200).send({ status: "success", message: "Detail of publication ", publication: publicationStored })
 }
 
+const remove = async (req, res) => {
+  const publicationId = req.params.id
+
+  const publicationDeleted = await Publication.findOneAndDelete({ user: req.user._id, _id: publicationId })
+  if (!publicationDeleted) return res.status(404).send({ status: "error", message: "Publication not found" })
+
+  return res.status(200).send({ status: "success", message: "Publication remove success", publication: publicationId })
+}
+
 module.exports = {
   save,
-  detail
+  detail,
+  remove
 }
