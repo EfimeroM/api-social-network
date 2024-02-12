@@ -33,7 +33,7 @@ const following = async (req, res) => {
 
   const usersStored = await Follow
     .find({ user: userId })
-    .populate("user followed", "-password -role -__v")
+    .populate("user followed", "-password -role -__v -email")
     .paginate(page, itemsPerPage)
   const total = await Follow.find({ user: userId }).countDocuments().exec()
   const followUserIds = await followService.followUserIds(req.user._id)
@@ -58,7 +58,7 @@ const followers = async (req, res) => {
 
   const usersStored = await Follow
     .find({ followed: userId })
-    .populate("user", "-password -role -__v")
+    .populate("user", "-password -role -__v -email")
     .paginate(page, itemsPerPage)
   const total = await Follow.find({ followed: userId }).countDocuments().exec()
   const followUserIds = await followService.followUserIds(req.user._id)

@@ -76,7 +76,11 @@ const list = async (req, res) => {
   const page = parseInt(req.params.page) || 1
   const itemsPerPage = 5
 
-  const usersDb = await User.find().sort('_id').paginate(page, itemsPerPage)
+  const usersDb = await User
+    .find()
+    .select("-password -email -role -__v")
+    .sort('_id')
+    .paginate(page, itemsPerPage)
   if (!usersDb) return res.status(404).send({ status: "error", message: "Users not found" })
 
   const total = await User.countDocuments().exec()
