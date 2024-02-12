@@ -18,6 +18,7 @@ router.get("/profile/:id", check.auth, UserController.getById)
 router.get("/list/:page?", check.auth, UserController.list)
 router.put("/update", check.auth, UserController.update)
 router.post("/upload", [check.auth, uploads.single("file0")], UserController.uploadImage)
-router.get("/avatar/:file", check.auth, UserController.getImage)
+router.get("/avatar/:file", UserController.getImage)
+router.get("/counters/:id?", check.auth, UserController.counters)
 
 module.exports = router

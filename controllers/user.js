@@ -2,9 +2,12 @@ const User = require("../models/User")
 const bcrypt = require("bcrypt")
 const jwt = require("../services/jwt")
 const mongoosePaginate = require("mongoose-pagination")
+const Follow = require("../models/Follow")
 const followService = require("../services/followService")
+const Publication = require("../models/Publication")
 const fs = require("fs")
 const path = require("path")
+const validate = require("../helpers/validate")
 const { IMAGES_PATH } = require("../config")
 
 const register = async (req, res) => {
@@ -12,6 +15,12 @@ const register = async (req, res) => {
 
   if (!params.name || !params.nick || !params.email || !params.password) {
     return res.status(400).json({ status: "error", message: "Missing data to send" })
+  }
+
+  try {
+    validate(params)
+  } catch (error) {
+    return res.status(400).json({ status: "error", message: error.message })
   }
 
   try {
@@ -125,6 +134,8 @@ const update = async (req, res) => {
   if (userToUpdate.password) {
     let pwd_hash = await bcrypt.hash(userToUpdate.password, 10)
     userToUpdate.password = pwd_hash
+  }else{
+    delete userToUpdate.password
   }
 
   try {
@@ -165,6 +176,28 @@ const getImage = async (req, res) => {
   })
 }
 
+const counters = async (req, res) => {
+  const userId = req.params.id || req.user._id
+  console.log(userId)
+
+  try {
+    const following = await Follow.find({ user: userId }).countDocuments()
+    const followed = await Follow.find({ followed: userId }).countDocuments()
+    const publications = await Publication.find({ user: userId }).countDocuments()
+
+    return res.status(200).send({
+      status: "success",
+      message: "Counters of user",
+      userId,
+      following,
+      followed,
+      publications
+    })
+  } catch (error) {
+    return res.status(500).send({ status: "error", message: "Error to get user information" })
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -172,5 +205,6 @@ module.exports = {
   list,
   update,
   uploadImage,
-  getImage
+  getImage,
+  counters
 }
