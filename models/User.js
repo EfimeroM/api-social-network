@@ -25,7 +25,7 @@ const UserSchema = Schema({
   },
   image: {
     type: String,
-    default: "default.png"
+    default: "default.webp"
   },
   created_at: {
     type: Date,
