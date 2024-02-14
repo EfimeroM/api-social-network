@@ -114,7 +114,7 @@ const list = async (req, res) => {
     .paginate(page, itemsPerPage)
   if (!usersDb) return res.status(404).json({ status: "error", message: "Users not found" })
 
-  const total = await User.countDocuments().exec()
+  const total = await User.countDocuments()
 
   // get user ids following and followers
   const followUserIds = await followService.followUserIds(req.user._id)
