@@ -84,7 +84,7 @@ const login = async (req, res) => {
 const getById = async (req, res) => {
   const { id } = req.params
   try {
-    const userDb = await User.findById(id).select({ password: 0, role: 0, email: 0 })
+    const userDb = await User.findById(id).select({ password: 0, role: 0, email: 0, created_at: 0, __v: 0 })
 
     if (!userDb) return res.status(404).json({ status: "error", message: "User not found" })
 

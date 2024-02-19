@@ -5,6 +5,7 @@ const { PORT } = require("./config")
 const UserRoutes = require("./routes/user")
 const PublicationRoutes = require("./routes/publication")
 const FollowRoutes = require("./routes/follow")
+const { swaggerDocs } = require("./swagger")
 
 connectionDb()
 
@@ -18,4 +19,7 @@ app.use("/api/user", UserRoutes)
 app.use("/api/publication", PublicationRoutes)
 app.use("/api/follow", FollowRoutes)
 
-app.listen(PORT, ()=> console.log("Initialized server on port:", PORT))
+app.listen(PORT, () => {
+  console.log(`Initialized server on port:: ${PORT}`)
+  swaggerDocs(app, PORT)
+})

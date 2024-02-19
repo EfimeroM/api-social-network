@@ -1,0 +1,845 @@
+#Config
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: API Social Network
+  description: API Rest Social Network
+
+#Routes
+paths:
+  #User
+  /api/user/register:
+    post:
+      tags:
+        - Create User
+      summary: Create a new user
+      requestBody:
+        description: User data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User registered
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      surname: Perez
+                      nick: juanperez1301
+                      bio: Hola a todos! soy nuevo en esta red social.
+                      image: avatar-1706215503076-mi-avatar.jpg
+  /api/user/login:
+    post:
+      tags:
+        - Login User
+      summary: Login a new user
+      requestBody:
+        description: User data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: juan@outlook.com
+                password:
+                  type: string
+                  example: pass_001
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User loged
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      nick: juanperez1301
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI2NWNkNjIzYWVkMDgwN2Y5ZjFmOGM3ODIiLCJuYW1lIjoiSnVhbiIsInN1cm5hbWUiOiJQZXJleiIsIm5pY2siOiJqdWFucGVyZXoxMzAxIiwiZW1haWwiOiJqdWFuQG91dGxvb2suY29tIiwicm9sZSI6InJvbGVfdXNlciIsImltYWdlIjoiYXZhdGFyLTE3MDYyMTU1MDMwNzYtbWktYXZhdGFyLmpwZyIsImlhdCI6MTcwODAyMTgwNywiZXhwIjoxNzEwNjEzODA3fQ.DMfN0w_jg7vec5sCR9Lv0tRYOzDd4jLh72KStiIxRIY
+  /api/user/profile/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get User
+      summary: Get User by id
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: Get user by Id
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      surname: Perez
+                      nick: juanperez1301
+                      bio: Hola a todos! soy nuevo en esta red social.
+                      image: avatar-1706215503076-mi-avatar.jpg
+                    following:
+                      _id: 65ccee5e34b2d0d48b7daf18
+                      user: 65ca5775e8c3296413a6c7ba
+                      followed: 65ca5fd433e422a35c198eb8
+                      created_at: 2024-02-14T16:46:22.319Z
+                    follower:
+                      _id: 65ccf4c365ec39655c425330
+                      user: 65ca5fd433e422a35c198eb8
+                      followed: 65ca5775e8c3296413a6c7ba
+                      created_at: 2024-02-14T17:13:39.045Z
+  /api/user/list/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get Users list
+      summary: Get Users list
+      parameters:
+        - name: page
+          in: path
+          description: page of users list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: Get users with page
+                    page: 1
+                    pages: 1
+                    itemsPerPage: 5
+                    total: 4
+                    usersFollowing:
+                      ["65ca5fd433e422a35c198eb8", "65ca7b7cb594d720a67d2bf9"]
+                    usersFollowers: ["65ca5fd433e422a35c198eb8"]
+                    users:
+                      [
+                        {
+                          "_id": "65ca5775e8c3296413a6c7ba",
+                          "name": "JuanB",
+                          "surname": "Perez",
+                          "nick": "juanperez",
+                          "bio": "Bienvenidos a mi red social, soy Juan",
+                          "image": "avatar-1707769189917-profile.jpg",
+                          "created_at": "2024-02-12T17:37:57.092Z",
+                        },
+                        {
+                          "_id": "65ca5fd433e422a35c198eb8",
+                          "name": "Martin",
+                          "surname": "Perez",
+                          "nick": "martinperez",
+                          "bio": "Bienvenidos a mi red social, soy Martin",
+                          "image": "./uploads/avatars/default.webp",
+                          "created_at": "2024-02-12T18:13:40.755Z",
+                        },
+                      ]
+  /api/user/update:
+    put:
+      security:
+        - BearerAuth: []
+      tags:
+        - Update User
+      summary: Update my user
+      requestBody:
+        description: Example change a field
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: juan@juan.com
+                nick:
+                  type: string
+                  example: JuanNuevoNick
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: User updated
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      surname: Perez
+                      nick: JuanNuevoNick
+                      bio: Hola a todos! soy nuevo en esta red social.
+                      image: avatar-1706215503076-mi-avatar.jpg
+                    token: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI2NWNkNjIzYWVkMDgwN2Y5ZjFmOGM3ODIiLCJuYW1lIjoiSnVhbiIsInN1cm5hbWUiOiJQZXJleiIsIm5pY2siOiJqdWFucGVyZXoxMzAxIiwiZW1haWwiOiJqdWFuQG91dGxvb2suY29tIiwicm9sZSI6InJvbGVfdXNlciIsImltYWdlIjoiYXZhdGFyLTE3MDYyMTU1MDMwNzYtbWktYXZhdGFyLmpwZyIsImlhdCI6MTcwODAyMTgwNywiZXhwIjoxNzEwNjEzODA3fQ.DMfN0w_jg7vec5sCR9Lv0tRYOzDd4jLh72KStiIxRIY
+  /api/user/upload:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Upload user image
+      summary: Upload user image - avatar
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: Image uploaded
+                    file:
+                      fieldname: file0
+                      originalname: profile.jpg
+                      encoding: 7bit
+                      mimetype: image/jpeg
+                      destination: ./uploads/avatars/
+                      filename: avatar-1708213120799-profile.jpg
+                      path: uploads\\avatars\\avatar-1708213120799-profile.jpg
+                      size: 9041
+                    user:
+                      _id: 65ca5775e8c3296413a6c7ba
+                      name: Juan
+                      surname: Perez
+                      nick: JuanNuevoNick
+                      bio: Hola a todos! soy nuevo en esta red social.
+                      image: avatar-1706215503076-mi-avatar.jpg
+  /api/user/avatar/{file}:
+    get:
+      tags:
+        - Get User Image
+      summary: Get User image by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              example: <Binary Data for Image>
+              description: Return a image
+  /api/user/counters/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - User information counter
+      summary: User information counter(following, followed, publications)
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: false
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                userResponse:
+                  value:
+                    status: success
+                    message: Counters of user
+                    userId: 65ca5775e8c3296413a6c7ba
+                    following: 2
+                    followed: 1
+                    publications: 5
+  #Follow
+  /api/follow/save:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Save follow
+      summary: Save user follow
+      requestBody:
+        description: User id followed
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                followed:
+                  type: string
+                  example: 65ca7b7cb594d720a67d2bf9
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Success followed user
+                    follow:
+                      user: 65ca5fd433e422a35c198eb8
+                      followed: 65ca7b7cb594d720a67d2bf9
+                      _id: 65d14d914550280506dff783
+                      created_at: 2024-02-18T00:21:37.277Z
+  /api/follow/unfollow/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Delete follow
+      summary: Delete follow by id
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Success deleted follow
+  /api/follow/following/{id}/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get following
+      summary: Get following
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+        - name: page
+          in: path
+          description: page of following list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: List of followed users
+                    page: 1
+                    pages: 1
+                    itemsPerPage: 5
+                    total: 2
+                    usersFollowing:
+                      ["65ca5fd433e422a35c198eb8", "65ca7b7cb594d720a67d2bf9"]
+                    usersFollowers: ["65ca5fd433e422a35c198eb8"]
+                    follows:
+                      [
+                        {
+                          _id: 65ccee5e34b2d0d48b7daf18,
+                          user:
+                            {
+                              _id: 65ca5775e8c3296413a6c7ba,
+                              name: JuanB,
+                              surname: Perez,
+                              nick: JuanNuevoNick,
+                              bio: Bienvenidos a mi red social,
+                              soy Juan,
+                              image: avatar-1708213120799-profile.jpg,
+                            },
+                          followed:
+                            {
+                              _id: 65ca5fd433e422a35c198eb8,
+                              name: Martin,
+                              surname: Perez,
+                              nick: martinperez,
+                              bio: Bienvenidos a mi red social,
+                              soy Martin,
+                              image: ./uploads/avatars/default.webp,
+                            },
+                          created_at: 2024-02-14T16:46:22.319Z,
+                          __v: 0,
+                        },
+                        {
+                          _id: 65ccefa5aa3c0b4ffd62b4fe,
+                          user:
+                            {
+                              _id: 65ca5775e8c3296413a6c7ba,
+                              name: JuanB,
+                              surname: Perez,
+                              nick: JuanNuevoNick,
+                              bio: Bienvenidos a mi red social,
+                              soy Juan,
+                              image: avatar-1708213120799-profile.jpg,
+                            },
+                          followed:
+                            {
+                              _id: 65ca7b7cb594d720a67d2bf9,
+                              name: Pablo,
+                              surname: Perez,
+                              nick: pabloperez,
+                              bio: Bienvenidos a mi red social,
+                              soy Pablo,
+                              image: ./uploads/avatars/default.webp,
+                            },
+                          created_at: 2024-02-14T16:51:49.092Z,
+                          __v: 0,
+                        },
+                      ]
+  /api/follow/followers/{id}/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get followers
+      summary: Get followers
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+        - name: page
+          in: path
+          description: page of followers list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Followers list
+                    page: 1
+                    pages: 1
+                    itemsPerPage: 5
+                    total: 1
+                    usersFollowing:
+                      ["65ca5fd433e422a35c198eb8", "65ca7b7cb594d720a67d2bf9"]
+                    usersFollowers: ["65ca5fd433e422a35c198eb8"]
+                    follows:
+                      [
+                        {
+                          _id: 65ccf4c365ec39655c425330,
+                          user:
+                            {
+                              _id: 65ca5fd433e422a35c198eb8,
+                              name: Martin,
+                              surname: Perez,
+                              nick: martinperez,
+                              bio: Bienvenidos a mi red social,
+                              soy Martin,
+                              image: ./uploads/avatars/default.webp,
+                            },
+                          followed: 65ca5775e8c3296413a6c7ba,
+                          created_at: 2024-02-14T16:46:22.319Z,
+                        },
+                      ]
+  #Publication
+  /api/publication/save:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Save publication
+      summary: Save user publication
+      requestBody:
+        description: publication text
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  example: Buenos dias a todos!!
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Publication saved
+                    publicationStored:
+                      user: 65ca5775e8c3296413a6c7ba
+                      text: Buenos dias gente!
+                      _id: 65d2c12c93bd853d0b6bb631
+                      created_at: 2024-02-19T02:47:08.633Z
+  /api/publication/detail/{id}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get publication
+      summary: Get publication by id
+      parameters:
+        - name: id
+          in: path
+          description: publication id
+          required: true
+          schema:
+            type: string
+            example: 65ccf7ef32e6e6344044c4de
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Detail of publication
+                    publication:
+                      _id: 65ccf7ef32e6e6344044c4de
+                      user:
+                        _id: 65ca5fd433e422a35c198eb8
+                        name: Martin
+                        surname: Perez
+                        nick: martinperez
+                        image: ./uploads/avatars/default.webp
+                      text: Hola, esto es como twitter?
+                      created_at: 2024-02-14T17:27:11.153Z
+                      file: pub-1707932810091-aSxf.jpg
+  /api/publication/remove/{id}:
+    delete:
+      security:
+        - BearerAuth: []
+      tags:
+        - Remove publication
+      summary: Remove publication by id
+      parameters:
+        - name: id
+          in: path
+          description: publication id
+          required: true
+          schema:
+            type: string
+            example: 65cd623aed0807f9f1f8c782
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Publication remove success
+                    publicationId: 65ccf7ef32e6e6344044c4de
+  /api/publication/user/{id}/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get user publications
+      summary: Get user publications by user id
+      parameters:
+        - name: id
+          in: path
+          description: user id
+          required: true
+          schema:
+            type: string
+            example: 65ca5775e8c3296413a6c7ba
+        - name: page
+          in: path
+          description: page of the list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: User publication list
+                    publication:
+                      _id: 65ccf7ef32e6e6344044c4de
+                      page: 1
+                      pages: 1
+                      itemsPerPage: 5
+                      total: 1
+                      publications:
+                        [
+                          {
+                            "_id": "65d2c12c93bd853d0b6bb631",
+                            "user":
+                              {
+                                "_id": "65ca5775e8c3296413a6c7ba",
+                                "name": "JuanB",
+                                "surname": "Perez",
+                                "nick": "JuanNuevoNick",
+                                "bio": "Bienvenidos a mi red social, soy Juan",
+                                "image": "avatar-1708213120799-profile.jpg",
+                              },
+                            "text": "Buenos dias gente!",
+                            "created_at": "2024-02-19T02:47:08.633Z",
+                          },
+                        ]
+  /api/publication/upload/{id}:
+    post:
+      security:
+        - BearerAuth: []
+      tags:
+        - Upload publication image
+      summary: Upload publication image by id
+      parameters:
+        - name: id
+          in: path
+          description: publication id
+          required: true
+          schema:
+            type: string
+            example: 65ccfda68b81e64aba995627
+      requestBody:
+        description: file to upload
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file0:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Image publication uploaded
+                    publication:
+                      _id: 65ccfda68b81e64aba995627
+                      user: 65ca5775e8c3296413a6c7ba
+                      text: Hola, soy juan
+                      created_at: 2024-02-14T17:51:34.786Z
+                      file: pub-1708358621909-Asxr.jpg
+                    file:
+                      fieldname: file0
+                      originalname: Asxr.jpg
+                      encoding: 7bit
+                      mimetype: image/jpeg
+                      destination: ./uploads/publications/
+                      filename: pub-1708358621909-Asxr.jpg
+                      path: uploads\\publications\\pub-1708358621909-Asxr.jpg
+                      size: 9041
+  /api/publication/media/{file}:
+    get:
+      tags:
+        - Get User Publication Image
+      summary: Get User Publication Image by file name
+      parameters:
+        - name: file
+          in: path
+          description: file name
+          required: true
+          schema:
+            type: string
+            example: pub-1707932810091-Asx2.jpg
+      responses:
+        "200":
+          description: OK
+          content:
+            image/*:
+              example: <Binary Data for Image>
+              description: Return a image
+  /api/publication/feed/{page}:
+    get:
+      security:
+        - BearerAuth: []
+      tags:
+        - Get feed of follows
+      summary: Get feed of my follows
+      parameters:
+        - name: page
+          in: path
+          description: page of the list
+          required: false
+          schema:
+            type: number
+            example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              examples:
+                followResponse:
+                  value:
+                    status: success
+                    message: Feed of my follows
+                    page: 1
+                    pages: 1
+                    itemsPerPage: 5
+                    total: 1
+                    following: [65ca5775e8c3296413a6c7ba]
+                    publications:
+                      [
+                        {
+                          "_id": "65d2c12c93bd853d0b6bb631",
+                          "user":
+                            {
+                              "_id": "65ca5775e8c3296413a6c7ba",
+                              "name": "JuanB",
+                              "surname": "Perez",
+                              "nick": "JuanNuevoNick",
+                              "bio": "Bienvenidos a mi red social, soy Juan",
+                              "image": "avatar-1708213120799-profile.jpg",
+                            },
+                          "text": "Buenos dias gente!",
+                          "created_at": "2024-02-19T02:47:08.633Z",
+                        },
+                      ]
+#Schemas
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Juan
+        surname:
+          type: string
+          example: Perez
+        nick:
+          type: string
+          example: juanperez1301
+        bio:
+          type: string
+          example: Hola a todos! soy nuevo en esta red social.
+        email:
+          type: string
+          example: juan@outlook.com
+        password:
+          type: string
+          example: pass_001
+        image:
+          type: string
+          example: avatar-1706215503076-mi-avatar.jpg
+      required:
+        - name
+        - nick
+        - email
+        - password
+    Follow:
+      type: object
+      properties:
+        user:
+          type: string
+          format: objectId
+          example: 65ca5775e8c3296413a6c7ba
+        followed:
+          type: string
+          format: objectId
+          example: 65ca5fd433e422a35c198eb8
+      required:
+        - user
+        - followed
+    Publication:
+      type: object
+      properties:
+        user:
+          type: string
+          format: objectId
+          example: 65ca5775e8c3296413a6c7ba
+        text:
+          type: string
+          example: Hola, soy juan
+        file:
+          type: string
+          example: pub-1708358621909-aXs2.jpg
+      required:
+        - user
+        - text

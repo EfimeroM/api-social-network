@@ -17,8 +17,8 @@ const followUserIds = async (identityUserId) => {
 }
 
 const followThisUser = async (identityUserId, profileUserId) => {
-  let following = await Follow.findOne({ user: identityUserId })
-  let followers = await Follow.findOne({ user: profileUserId, followed: identityUserId })
+  let following = await Follow.findOne({ user: identityUserId, followed: profileUserId }).select({ __v: 0 })
+  let followers = await Follow.findOne({ user: profileUserId, followed: identityUserId }).select({ __v: 0 })
 
   return {
     following,

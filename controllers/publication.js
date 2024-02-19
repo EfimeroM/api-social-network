@@ -137,8 +137,8 @@ const feed = async (req, res) => {
       message: "Feed of my follows",
       page,
       pages: Math.ceil(total / itemsPerPage),
-      total,
       itemsPerPage,
+      total,
       following,
       publications: publicationsStored
     })

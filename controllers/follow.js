@@ -63,7 +63,7 @@ const following = async (req, res) => {
       follows: usersStored,
     })
   } catch (error) {
-    return res.status(500).json({ status: "error", message: "Error to list following" })
+    return res.status(500).json({ status: "error", message: "Error to list following"+error })
   }
 }
 
